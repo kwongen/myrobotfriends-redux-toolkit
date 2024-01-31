@@ -1,44 +1,36 @@
-import React, {Component} from 'react';
-import { connect } from 'react-redux';
+import React, {useEffect} from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import CardList from '../components/CardList';
 import SearchBox from '../components/SearchBox';
 import Scroll from '../components/Scroll';
 import ErrorBoundary from '../components/ErrorBoundary';
-//import { robots } from './robots';
+
 import '../containers/App.css';
 
-import { setSearchField, requestRobots } from '../actions';
+import { setSearchField, requestRobots } from '../slice';
 
-const mapStateToProps = (state) => {
-	return {
-		searchField: state.searchRobots.searchField,
-		robots: state.requestRobots.robots,
-		isPending: state.requestRobots.isPending,
-		error: state.requestRobots.error
-	}
-}
+function App() {
+	const searchField = useSelector((state) => state.searchRobots.searchField);
+	const robots = useSelector((state) => state.requestRobots.robots);
+	const isPending = useSelector((state) => state.requestRobots.isPending);
+	const dispatch = useDispatch();
 
-const mapDispatchToProps = (dispatch) => {
-	return {
-		onSearchChange: (event) => dispatch(setSearchField(event.target.value)),
-		onRequestRobots: () => dispatch(requestRobots())
-	}
-}
-
-class App extends Component {
-	componentDidMount() {
-		this.props.onRequestRobots();
+	const onSearchChange = (event) => {
+		dispatch(setSearchField(event.target.value));
 	}
 
-	render () {
-		const {searchField, onSearchChange, robots, isPending} = this.props;
+	useEffect(() => {
+		dispatch(requestRobots());
+	}, []);
 
-		const filterRobots = robots.filter(robot => {
-			return robot.name.toLowerCase().includes(searchField.toLowerCase())
-		});
+	const filterRobots = robots.filter(robot => {
+		return robot.name.toLowerCase().includes(searchField.toLowerCase())
+	});
 
-		return (isPending)  ?
-			 <h1>Loading...</h1> :
+	return (isPending)  
+			?
+			<h1>Loading...</h1> 
+			:
 			(
 				<div className='tc'>
 					<h1 className='f1'>My RobotFriends</h1>
@@ -50,7 +42,6 @@ class App extends Component {
 					</Scroll>
 				</div>
 			);
-	}
-};
+} 
 
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default App;
